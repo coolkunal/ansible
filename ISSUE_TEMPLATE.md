@@ -1,28 +1,52 @@
 ##### Issue Type:
 
-Can you help us out in labelling this by telling us what kind of ticket this this?  You can say “Bug Report”, “Feature Idea”, “Feature Pull Request”, “New Module Pull Request”, “Bugfix Pull Request”, “Documentation Report”, or “Docs Pull Request”.
+Bug Report
 
 ##### Ansible Version:
+Ansbile Version 1.8.4
 
-Let us know what version of Ansible you are using.  Please supply the verbatim output from running “ansible --version”.  If you're filing a ticket on a version of Ansible which is not the latest, we'd greatly appreciate it if you could retest on the latest version first.  We don't expect you to test against the development branch most of the time, but we may ask for that if you have cycles.  Thanks!
+ansible 1.8.4
 
 ##### Environment:
 
-What OS are you running Ansible from and what OS are you managing?  Examples include RHEL 5/6, Centos 5/6, Ubuntu 12.04/13.10, *BSD, Solaris.  If this is a generic feature request or it doesn’t apply, just say “N/A”.  Not all tickets may be about operating system related things and we understand that.
+Running Ansible Playbook from -Red Hat Enterprise Linux Server release 5.5 (Tikanga) 
+Managing os -Rhel 6.4(Santiago)(remote server)
 
 ##### Summary:
 
-Please summarize your request in this space.  You will earn bonus points for being succinct, but please add enough detail so we can understand the request.  Thanks!
+I am running synchrnoize module in my playbook to copy of the tar file to remote server and i have observed that synchrnoize.py module of ansible is failing for this operation due to rsync output format issue.
+Error which i am getting after running playbook is:
+
+failed: [ip -> 127.0.0.1] => {"cmd": "rsync --delay-updates -FF --compress --archive --rsh 'ssh -S none -o StrictHostKeyChecking=no' --out-format='<>%i %n%L' \"/prd/file.tar.gz/roles/server/files/abc.tar.tgz\" \"root@remoteip:/tmp\"", "failed": true, "rc": 1}
+msg: rsync: --out-format=<>%i %n%L: unknown option
+rsync error: syntax or usage error (code 1) at main.c(1231) [client=2.6.8]
+
+FATAL: all hosts have already failed -- aborting
+
+I am using synchronize module of ansible for copying operation which is failing since rsync: --out-format=<>%i %n%L: unknown option..
+I have also changed synchronize.py module by adding some lines of code to avoid the above prblem..
+Please look into this as for rhel 5.5 its not working
 
 ##### Steps To Reproduce:
 
-If this is a bug ticket, please enter the steps you use to reproduce the problem in the space below.  If this is a feature request, please enter the steps you would use to use the feature.  If an example playbook is useful, please include a short reproducer inline, indented by four spaces.  If a longer one is necessary, linking to one uploaded to gist.github.com would be great.  Much appreciated!
+Playbook example:
+The below tasks is added in one of the roles .So when I am running playbook the playbook fails at this point .
+Problem is the rsync which is used by syncroize is adding  --out-format=<>%i %n%L which is unknown option.
+
+  - name: Copying the build on to the remote server
+   synchronize: src={build_name}}.tgz dest=/tmp
+
 
 ##### Expected Results:
-
-Please enter your expected results in this space.  When running the steps supplied above in the previous section, what did you expect to happen?  If showing example output, please indent your output by four spaces so it will render correctly in GitHub's viewer thingy.
+Expected result - build should get copied to path specified in remote server
 
 ##### Actual Results:
 
-Please enter your actual results in this space.  When running the steps supplied above, what actually happened?  If you are showing example output, please indent your output by four spaces so it will render correctly in GitHub.  Thanks again!
+Actual output:
+
+failed: [ip -> 127.0.0.1] => {"cmd": "rsync --delay-updates -FF --compress --archive --rsh 'ssh -S none -o StrictHostKeyChecking=no' --out-format='<>%i %n%L' \"/prd/file.tar.gz/roles/server/files/abc.tar.tgz\" \"root@remoteip:/tmp\"", "failed": true, "rc": 1}
+msg: rsync: --out-format=<>%i %n%L: unknown option
+
+FATAL: all hosts have already failed -- aborting
+
 
